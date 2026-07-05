@@ -142,6 +142,8 @@
     <div class="nav-group-label">Grow</div>
     <a href="#performance" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Performance</a>
     <a href="#recruitment" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Recruitment</a>
+    <div class="nav-group-label">Insights</div>
+    <a href="#reports" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</a>
     <div class="nav-group-label">Mobile</div>
     <a href="#fatehhr" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Fateh HR App</a>
     <div class="nav-group-label">Reference</div>
@@ -345,6 +347,41 @@
       </div>
       <figure class="shot"><img src="img/job-opening-new.png" alt="New Job Opening form" loading="lazy" /><figcaption><b>Job Opening</b> — the published vacancy: designation, department, number of positions, and status.</figcaption></figure>
       <figure class="shot"><img src="img/job-applicant-new.png" alt="New Job Applicant form" loading="lazy" /><figcaption><b>Job Applicant</b> — capture the candidate's details, source, rating, resume and salary expectation; move them through the pipeline via Status.</figcaption></figure>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- REPORTS -->
+    <section class="section" id="reports">
+      <div class="section-title"><div class="icon-wrap ic-pine"><svg viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>Reports</div>
+      <div class="section-subtitle">The built-in HR &amp; Payroll reports — how to run and export any of them, and the ones you'll use most.</div>
+
+      <h3 class="hdr">How to run &amp; export a report</h3>
+      <div class="steps">
+        <div class="step"><div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div><div class="step-body"><p><b>Open it</b> — search the report name (<code>Ctrl/Cmd + G</code>), or find it under the <span class="path">HR</span> / <span class="path">Payroll</span> workspace "Reports" cards.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div><div class="step-body"><p><b>Set the filters</b> at the top — Company, a date range (From/To or Month/Year), and optionally Employee / Department — then <b>Refresh</b>.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">3</div></div><div class="step-body"><p><b>Use the results</b> — sort/reorder columns, and from the <b>⋮ menu</b> choose <b>Group By</b>, <b>Pick Columns</b>, <b>Export</b> (Excel / CSV), or <b>Print</b> for a PDF.</p></div></div>
+      </div>
+      <div class="info-box amber"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg><span>Reports output <b>live employee data</b> (names, salaries) — so no sample rows are shown in this guide; open them on your own desk. Access is role-gated (e.g. only HR/Payroll roles see Salary Register).</span></div>
+
+      <h3 class="hdr">The reports you'll use</h3>
+      <div class="tbl-wrap"><table class="field-table">
+        <thead><tr><th>Report</th><th>Module</th><th>What it shows</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Monthly Attendance Sheet</td><td>Attendance</td><td>A month grid — each employee's day-by-day Present / Absent / Leave / Half-day, with totals.</td></tr>
+          <tr><td class="field-name">Employee Checkin</td><td>Attendance</td><td>The raw IN / OUT logs; filter by employee, shift, or date range.</td></tr>
+          <tr><td class="field-name">Employee Leave Balance</td><td>Leave</td><td>Remaining days per leave type per employee, as of a date.</td></tr>
+          <tr><td class="field-name">Employee Information</td><td>Employee</td><td>Master-data export — contact, joining, department, designation, IDs.</td></tr>
+          <tr><td class="field-name">Employee Analytics</td><td>Employee</td><td>Headcount grouped by department / designation / grade / branch.</td></tr>
+          <tr><td class="field-name">Employee Birthday</td><td>Employee</td><td>Upcoming birthdays for the month.</td></tr>
+          <tr><td class="field-name">Employees Working on a Holiday</td><td>Attendance</td><td>Who has attendance on a holiday-list day.</td></tr>
+          <tr><td class="field-name">Employee Exits</td><td>Employee</td><td>Separations / attrition over a period.</td></tr>
+          <tr><td class="field-name">Recruitment Analytics</td><td>Recruitment</td><td>Pipeline — openings, applicants and offers by stage.</td></tr>
+          <tr><td class="field-name">Salary Register</td><td>Payroll</td><td>All salary slips for a period, broken out component-by-component.</td></tr>
+          <tr><td class="field-name">Bank Remittance</td><td>Payroll</td><td>Net pay per employee for the bank transfer / WPS file.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout green"><h4>Dashboards</h4>The <b>HR Dashboard</b> and <b>Recruitment / Attendance / Expense Claims</b> dashboards (workspace shortcuts) chart the same data visually — headcount, leave, attendance trends — for an at-a-glance view.</div>
     </section>
 
     <hr class="divider" />
