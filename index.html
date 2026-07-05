@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frappe HR / HRMS — Enfono Implementation Guide</title>
+  <meta name="description" content="Enfono Technologies' guide to HR & Payroll on ERPNext / Frappe HRMS — employee lifecycle, leave, attendance, expense claims, payroll, performance, recruitment, and the Fateh HR mobile app." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314342a'/%3E%3Cg fill='%238fcdad'%3E%3Cpath d='M7 24 L12 8 L15 8 L10 24 Z'/%3E%3Cpath d='M13 24 L18 8 L21 8 L16 24 Z'/%3E%3Cpath d='M19 24 L24 8 L27 8 L22 24 Z'/%3E%3C/g%3E%3C/svg%3E" />
+  <style>
+    /* ── Enfono green theme tokens ─────────────────────────────────────── */
+    :root {
+      --sidebar-bg: #14342a;
+      --brand: #2f8f6b;
+      --brand-deep: #1b4d3a;
+      --brand-light: #78be9b;
+      --brand-lighter: #acd7a7;
+      --ink: #142a22;
+      --bg: #f4f7f4;
+      --border: #e2ece6;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 15px; line-height: 1.7; color: var(--ink); background: var(--bg);
+      display: flex; min-height: 100vh;
+    }
+
+    /* ── Sidebar ────────────────────────────────────────────────────────── */
+    .sidebar {
+      width: 272px; min-height: 100vh; background: var(--sidebar-bg); color: #c5d8cd;
+      position: fixed; top: 0; left: 0; overflow-y: auto; display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-brand { padding: 22px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-brand img { width: 168px; height: auto; display: block; margin-bottom: 10px; }
+    .sidebar-brand .pill { font-size: 11px; color: #7fae97; font-weight: 600; }
+    .sidebar-brand .pill b { color: #cfe9dc; font-weight: 700; }
+
+    .sidebar-nav { padding: 12px 0; flex: 1; }
+    .nav-group-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #4d7a64; padding: 14px 20px 4px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 7px 20px; color: #9dbcac;
+      text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.15s;
+    }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.06); color: #fff; border-left-color: var(--brand-light); }
+    .nav-item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; flex-shrink: 0; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: #4d7a64; }
+    .sidebar-footer a { color: #7fae97; text-decoration: none; }
+
+    /* ── Main ───────────────────────────────────────────────────────────── */
+    .main { margin-left: 272px; flex: 1; min-height: 100vh; }
+    .page-header {
+      background: linear-gradient(135deg, #2f8f6b 0%, #1b4d3a 55%, #14342a 100%);
+      color: #fff; padding: 46px 48px 40px; position: relative; overflow: hidden;
+    }
+    .page-header::after {
+      content: ''; position: absolute; right: -60px; top: -70px; width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(140,205,173,0.38) 0%, transparent 70%); border-radius: 50%;
+    }
+    .page-header .tag {
+      display: inline-block; background: rgba(140,205,173,0.22); border: 1px solid rgba(140,205,173,0.5);
+      color: #d3f0e1; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; position: relative;
+    }
+    .page-header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; position: relative; }
+    .page-header p { font-size: 15px; color: #bfe0cf; max-width: 640px; position: relative; }
+    .page-header .meta { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+    .page-header .meta-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #93c2a9; }
+    .page-header .meta-item svg { width: 14px; height: 14px; stroke: #8ccdad; fill: none; }
+
+    .content-body { padding: 40px 48px; max-width: 940px; }
+
+    /* ── Section ───────────────────────────────────────────────────────── */
+    .section { margin-bottom: 54px; scroll-margin-top: 24px; }
+    .section-title { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.3px; }
+    .section-title .icon-wrap { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .section-title .icon-wrap svg { width: 20px; height: 20px; stroke: #fff; fill: none; }
+    .section-subtitle { color: #5c7a6c; font-size: 14px; margin-bottom: 22px; padding-left: 50px; }
+    .prose p { color: #3a5247; margin-bottom: 12px; }
+    .prose ul, .prose ol { padding-left: 22px; margin-bottom: 12px; }
+    .prose li { color: #3a5247; margin-bottom: 5px; }
+    .prose strong { color: var(--ink); }
+    .prose h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin: 22px 0 8px; }
+    a.inline { color: var(--brand); text-decoration: none; font-weight: 600; }
+    a.inline:hover { text-decoration: underline; }
+
+    /* ── Steps ─────────────────────────────────────────────────────────── */
+    .steps { position: relative; }
+    .step { display: flex; gap: 20px; margin-bottom: 8px; position: relative; }
+    .step-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 36px; }
+    .step-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; background: #e6f3ec; color: var(--brand-deep); }
+    .step-line { width: 2px; flex: 1; min-height: 20px; background: #dce8e1; margin: 4px 0; }
+    .step:last-child .step-line { display: none; }
+    .step-body { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; flex: 1; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(20,52,42,0.05); }
+    .step-body h3 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .step-body p { font-size: 13.5px; color: #475f53; margin-bottom: 6px; }
+    .step-body ul, .step-body ol { padding-left: 18px; }
+    .step-body li { font-size: 13.5px; color: #475f53; margin-bottom: 3px; }
+    .step-body li strong { color: var(--ink); }
+
+    /* ── Info box ──────────────────────────────────────────────────────── */
+    .info-box { border-radius: 10px; padding: 14px 16px; margin: 12px 0; font-size: 13px; display: flex; gap: 10px; align-items: flex-start; }
+    .info-box svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+    .info-box.green { background: #edf7f1; border: 1px solid #c4e4d3; color: #1b5e40; } .info-box.green svg { stroke: #2f8f6b; }
+    .info-box.blue  { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; } .info-box.blue svg { stroke: #2563eb; }
+    .info-box.amber { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; } .info-box.amber svg { stroke: #d97706; }
+    .info-box.red   { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; } .info-box.red svg { stroke: #dc2626; }
+
+    /* ── Field Table (card + zebra) ────────────────────────────────────── */
+    .field-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; margin: 16px 0; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(20,52,42,0.04); }
+    .field-table th { background: #eaf3ee; padding: 11px 16px; text-align: left; font-weight: 700; color: #35533f; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid #d5e6dd; }
+    .field-table td { padding: 12px 16px; border-bottom: 1px solid #eef4f0; vertical-align: top; color: #3a5247; line-height: 1.6; }
+    .field-table tbody tr:last-child td { border-bottom: none; }
+    .field-table tbody tr:nth-child(even) td { background: #f7fbf9; }
+    .field-table tbody tr:hover td { background: #edf7f1; }
+    .field-table .field-name { font-weight: 700; color: var(--brand-deep); }
+    .field-table code { white-space: nowrap; }
+    .tbl-wrap { overflow-x: auto; }
+
+    /* ── Badges / pills ────────────────────────────────────────────────── */
+    .badge-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    .badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .badge.grey { background: #eef2f0; color: #4b5f56; } .badge.grey .dot { background: #94a3b8; }
+    .badge.green { background: #edf7f1; color: #166534; } .badge.green .dot { background: #16a34a; }
+    .badge.blue { background: #eff6ff; color: #1e40af; } .badge.blue .dot { background: #3b82f6; }
+    .badge.amber { background: #fffbeb; color: #92400e; } .badge.amber .dot { background: #f59e0b; }
+    .badge.red { background: #fef2f2; color: #991b1b; } .badge.red .dot { background: #ef4444; }
+    .badge.purple { background: #f5f3ff; color: #5b21b6; } .badge.purple .dot { background: #7c3aed; }
+    .pill { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .3px; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .pill.req { background: #fef2f4; color: #dc2626; } .pill.auto { background: #edf7f1; color: #1b7a4e; } .pill.opt { background: #eef2f0; color: #64748b; }
+
+    /* ── Cards ─────────────────────────────────────────────────────────── */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin: 16px 0; }
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(20,52,42,0.05); }
+    .card .card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .card .card-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; }
+    .card h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+    .card p { font-size: 13px; color: #5c7a6c; line-height: 1.55; margin: 0; }
+    .card .k { font-size: 11px; font-weight: 700; color: #7d9a8b; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+
+    /* ── Flow diagram ──────────────────────────────────────────────────── */
+    .flow { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin: 16px 0; }
+    .flow .node { background: var(--sidebar-bg); color: #fff; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 8px; }
+    .flow .node.alt { background: var(--brand); }
+    .flow .arr { color: var(--brand-light); font-weight: 700; font-size: 16px; }
+
+    /* ── Callout ───────────────────────────────────────────────────────── */
+    .callout { border-left: 4px solid; padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 16px 0; font-size: 13.5px; }
+    .callout.green { border-color: var(--brand); background: #edf7f1; color: #14532d; }
+    .callout.blue  { border-color: #3b82f6; background: #eff6ff; color: #1e3a8a; }
+    .callout.amber { border-color: #d97706; background: #fffbeb; color: #7c2d12; }
+    .callout h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .callout p { margin-bottom: 6px; } .callout ul { padding-left: 18px; margin: 6px 0; } .callout li { margin-bottom: 3px; }
+
+    code { font-family: "SFMono-Regular", Consolas, monospace; background: #e9f1ec; color: #14342a; font-size: 12.5px; padding: 1px 6px; border-radius: 4px; }
+    pre { background: #10241c; color: #d7eadf; border-radius: 10px; padding: 16px 18px; margin: 12px 0; overflow-x: auto; font-family: "SFMono-Regular", Consolas, monospace; font-size: 12.5px; line-height: 1.6; color: #cfe5da; }
+    pre code { background: none; color: inherit; padding: 0; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+    /* ── Section icon colours (green family) ───────────────────────────── */
+    .ic-sage   { background: linear-gradient(135deg, #2f8f6b, #1b4d3a); }
+    .ic-emerald{ background: linear-gradient(135deg, #16a34a, #14532d); }
+    .ic-teal   { background: linear-gradient(135deg, #0d9488, #115e59); }
+    .ic-forest { background: linear-gradient(135deg, #15803d, #14532d); }
+    .ic-lime   { background: linear-gradient(135deg, #4d9e5a, #2f6e3c); }
+    .ic-moss   { background: linear-gradient(135deg, #5fa27f, #2d6a4f); }
+    .ic-pine   { background: linear-gradient(135deg, #0f766e, #134e4a); }
+    .ic-mint   { background: linear-gradient(135deg, #3fae86, #1b6e50); }
+
+    @media print { .sidebar { display: none; } .main { margin-left: 0; } .page-header, pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .section { page-break-inside: avoid; } }
+    @media (max-width: 820px) {
+      .sidebar { width: 100%; min-height: auto; position: relative; }
+      .main { margin-left: 0; } .content-body { padding: 24px 20px; } .page-header { padding: 32px 24px; }
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <img src="data:image/png;base64,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" alt="Enfono Technologies" />
+    <div class="pill"><b>HR &amp; Payroll</b> · Implementation Guide</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Core HR</div>
+    <a href="#overview" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Overview</a>
+    <a href="#employee" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Employee &amp; Lifecycle</a>
+    <a href="#leave" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg>Leave Management</a>
+    <a href="#attendance" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Attendance &amp; Shifts</a>
+
+    <div class="nav-group-label">Pay &amp; Claims</div>
+    <a href="#expense" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Expense &amp; Advances</a>
+    <a href="#payroll" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Payroll</a>
+
+    <div class="nav-group-label">Grow</div>
+    <a href="#performance" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Performance</a>
+    <a href="#recruitment" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Recruitment</a>
+
+    <div class="nav-group-label">Mobile</div>
+    <a href="#fatehhr" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Fateh HR App</a>
+
+    <div class="nav-group-label">Reference</div>
+    <a href="#settings" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Roles &amp; Settings</a>
+    <a href="#rollout" class="nav-item"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Rollout Checklist</a>
+  </nav>
+  <div class="sidebar-footer">Enfono Technologies<br>ERPNext v15 · Frappe HRMS</div>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main class="main">
+  <div class="page-header">
+    <div class="tag">Implementation Guide</div>
+    <h1>HR &amp; Payroll on ERPNext / Frappe HRMS</h1>
+    <p>Enfono's end-to-end guide to running HR on ERPNext — the employee lifecycle, leave, attendance, expense claims, payroll, performance and recruitment — plus <strong>Fateh HR</strong>, our mobile app that puts it in every employee's pocket.</p>
+    <div class="meta">
+      <div class="meta-item"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Rev. July 2026</div>
+      <div class="meta-item"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>ERPNext v15 · Frappe HRMS</div>
+      <div class="meta-item"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Fateh HR mobile app</div>
+    </div>
+  </div>
+
+  <div class="content-body">
+
+    <!-- OVERVIEW -->
+    <section class="section" id="overview">
+      <div class="section-title"><div class="icon-wrap ic-sage"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>Overview</div>
+      <div class="section-subtitle">The HR modules Enfono deploys, and how they fit together.</div>
+      <div class="prose">
+        <p>Frappe HR is the HR &amp; Payroll layer on ERPNext — one place for people data, so HR teams work on people, not paperwork. This guide covers the modules Enfono configures for clients, from hiring to exit, and how the <strong>Fateh HR</strong> mobile app extends them to the field.</p>
+      </div>
+      <div class="cards">
+        <div class="card"><div class="card-icon ic-sage"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><h3>Employee Lifecycle</h3><p>Onboarding, confirmation, transfers, promotions, and a clean exit — the whole journey on one record.</p></div>
+        <div class="card"><div class="card-icon ic-emerald"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg></div><h3>Leave &amp; Attendance</h3><p>Leave policies, holiday lists, geolocation check-in, balances and attendance — automated.</p></div>
+        <div class="card"><div class="card-icon ic-teal"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><h3>Expense &amp; Payroll</h3><p>Advances, expense claims with multi-level approval, salary structures, and payroll runs — posted straight to accounting.</p></div>
+        <div class="card"><div class="card-icon ic-forest"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3>Perform &amp; Hire</h3><p>Goals aligned to KRAs, appraisal cycles, and a recruitment pipeline from requisition to offer.</p></div>
+      </div>
+      <div class="callout green">
+        <h4>What's inside</h4>
+        Each section below covers the key records, the flow, and the fields that matter. The <a class="inline" href="#fatehhr">Fateh HR App</a> section covers the mobile experience your staff use daily.
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- EMPLOYEE -->
+    <section class="section" id="employee">
+      <div class="section-title"><div class="icon-wrap ic-sage"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>Employee &amp; Lifecycle</div>
+      <div class="section-subtitle">The Employee master and the events that move a person through the organisation.</div>
+      <div class="prose">
+        <p>The <strong>Employee</strong> record is the master for one person — demographics, job, reporting line, salary mode, leave policy, and history. Create one manually (name, gender, DOB, date of joining) or bulk-import via Data Import. A Company must exist first.</p>
+      </div>
+      <div class="flow">
+        <span class="node">Onboarding</span><span class="arr">→</span>
+        <span class="node alt">Active</span><span class="arr">→</span>
+        <span class="node">Confirmation</span><span class="arr">→</span>
+        <span class="node">Transfer / Promotion</span><span class="arr">→</span>
+        <span class="node">Separation</span>
+      </div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Record</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Employee</td><td>The person master — personal, job, contact, salary mode, leave policy, exit details.</td></tr>
+          <tr><td class="field-name">Employee Onboarding</td><td>A checklist of joining activities (from an Onboarding Template) that can auto-create the Employee.</td></tr>
+          <tr><td class="field-name">Employee Transfer</td><td>Move an employee between department / branch / company, effective a date.</td></tr>
+          <tr><td class="field-name">Employee Promotion</td><td>Record a designation / grade change with effect from a date.</td></tr>
+          <tr><td class="field-name">Employee Separation</td><td>Exit checklist (from a Separation Template) — clearance, encashment, relieving date.</td></tr>
+          <tr><td class="field-name">Employment Type / Grade / Designation / Department</td><td>Masters used to classify and group employees.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="prose"><h3>Key Employee fields</h3></div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Field</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Date of Joining</td><td>Drives leave allocation, payroll start, and tenure.</td></tr>
+          <tr><td class="field-name">Company / Department / Designation</td><td>Org placement; department drives approver defaults.</td></tr>
+          <tr><td class="field-name">Reports To</td><td>Reporting manager — used for approvals and the org chart.</td></tr>
+          <tr><td class="field-name">Holiday List</td><td>Determines weekly-offs / holidays for attendance &amp; leave.</td></tr>
+          <tr><td class="field-name">Leave Policy</td><td>Assigned via a Leave Policy Assignment to allocate leave.</td></tr>
+          <tr><td class="field-name">Salary Mode / Bank details</td><td>How the employee is paid; feeds payroll.</td></tr>
+          <tr><td class="field-name">User ID</td><td>Links the Employee to a login so they can self-serve (and use Fateh HR).</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- LEAVE -->
+    <section class="section" id="leave">
+      <div class="section-title"><div class="icon-wrap ic-emerald"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg></div>Leave Management</div>
+      <div class="section-subtitle">Configure policies once; allocate, apply, and track balances automatically.</div>
+      <div class="flow">
+        <span class="node">Leave Type</span><span class="arr">→</span>
+        <span class="node">Leave Policy</span><span class="arr">→</span>
+        <span class="node alt">Policy Assignment</span><span class="arr">→</span>
+        <span class="node">Allocation</span><span class="arr">→</span>
+        <span class="node">Application</span>
+      </div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Record</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Leave Type</td><td>Defines a kind of leave — paid/unpaid, max days, carry-forward, encashable, LWP.</td></tr>
+          <tr><td class="field-name">Leave Policy</td><td>Bundles Leave Types with annual counts (e.g. 20 Annual + 10 Sick).</td></tr>
+          <tr><td class="field-name">Leave Policy Assignment</td><td>Applies a policy to an employee for a period → creates the allocation.</td></tr>
+          <tr><td class="field-name">Leave Allocation</td><td>The actual leave credited to an employee for a period. <span class="pill req">needed for balance</span></td></tr>
+          <tr><td class="field-name">Leave Application</td><td>The employee's request; on approval it decrements the balance.</td></tr>
+          <tr><td class="field-name">Holiday List</td><td>Weekly-offs + public holidays; pulled into attendance and leave.</td></tr>
+          <tr><td class="field-name">Compensatory Leave / Encashment</td><td>Credit for working a holiday; encash unused balance via payroll.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="info-box green"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg><span>No balance showing for an employee? There's no <strong>Leave Allocation</strong> yet — assign a Leave Policy or allocate directly.</span></div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ATTENDANCE -->
+    <section class="section" id="attendance">
+      <div class="section-title"><div class="icon-wrap ic-teal"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>Attendance &amp; Shifts</div>
+      <div class="section-subtitle">From raw check-ins to daily Attendance — manual, or fully automated by shift.</div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Record</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Employee Checkin</td><td>A single IN or OUT log, optionally with geolocation. Fateh HR creates these from the field.</td></tr>
+          <tr><td class="field-name">Attendance</td><td>The daily Present / Absent / On Leave / Half Day record, with working hours.</td></tr>
+          <tr><td class="field-name">Shift Type</td><td>Defines start/end, grace, and the <strong>Auto Attendance</strong> rules that turn check-ins into Attendance.</td></tr>
+          <tr><td class="field-name">Shift Assignment</td><td>Puts an employee on a shift for a date range.</td></tr>
+          <tr><td class="field-name">Attendance Request</td><td>Employee requests attendance for missed days (WFH, on-duty) for approval.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout green">
+        <h4>Auto Attendance</h4>
+        Enable <strong>Auto Attendance</strong> on a Shift Type and Frappe HR converts Employee Checkins into daily Attendance on schedule — the backbone of the Fateh HR field check-in flow.
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- EXPENSE -->
+    <section class="section" id="expense">
+      <div class="section-title"><div class="icon-wrap ic-moss"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>Expense Claims &amp; Advances</div>
+      <div class="section-subtitle">Reimbursements and advances, with approval and a clean posting to accounts.</div>
+      <div class="flow">
+        <span class="node">Draft</span><span class="arr">→</span>
+        <span class="node alt">Submitted</span><span class="arr">→</span>
+        <span class="node">Approved</span><span class="arr">→</span>
+        <span class="node">Paid (Payment Entry)</span>
+      </div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Record</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Expense Claim</td><td>Itemised reimbursement request with receipts; multi-level approval; posts to a payable account.</td></tr>
+          <tr><td class="field-name">Employee Advance</td><td>Money advanced to an employee, later adjusted against claims or returned.</td></tr>
+          <tr><td class="field-name">Travel Request</td><td>Pre-trip approval capturing itinerary and estimated costs.</td></tr>
+          <tr><td class="field-name">Expense Claim Type</td><td>Master mapping each claim category to a default account.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="info-box blue"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span>Approvers can sanction <strong>less</strong> than claimed. Employees file claims (with a receipt photo per line) straight from Fateh HR.</span></div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- PAYROLL -->
+    <section class="section" id="payroll">
+      <div class="section-title"><div class="icon-wrap ic-forest"><svg viewBox="0 0 24 24" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>Payroll</div>
+      <div class="section-subtitle">Build salary structures once; run payroll monthly; employees see payslips instantly.</div>
+      <div class="flow">
+        <span class="node">Salary Components</span><span class="arr">→</span>
+        <span class="node">Salary Structure</span><span class="arr">→</span>
+        <span class="node alt">Structure Assignment</span><span class="arr">→</span>
+        <span class="node">Payroll Entry</span><span class="arr">→</span>
+        <span class="node">Salary Slips</span>
+      </div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Record</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Salary Component</td><td>An earning or deduction (Basic, HRA, Allowances, GOSI, Loan) — fixed or formula-based.</td></tr>
+          <tr><td class="field-name">Salary Structure</td><td>A reusable template of components defining gross → deductions → net.</td></tr>
+          <tr><td class="field-name">Salary Structure Assignment</td><td>Assigns a structure + base to an employee from a date.</td></tr>
+          <tr><td class="field-name">Payroll Entry</td><td>Runs payroll for a set of employees for a period → generates Salary Slips in bulk.</td></tr>
+          <tr><td class="field-name">Salary Slip</td><td>Per-employee payslip with the earnings/deductions breakup; downloadable as PDF.</td></tr>
+          <tr><td class="field-name">Payroll Period / Additional Salary</td><td>Defines the payroll calendar; off-cycle / one-off payments via Additional Salary.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout amber">
+        <h4>Statutory &amp; regional</h4>
+        Deductions like <strong>GOSI</strong> (KSA), end-of-service, or other statutory items are modelled as Salary Components with the right formula and caps. Confirm the current rates with the client's payroll lead before go-live.
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- PERFORMANCE -->
+    <section class="section" id="performance">
+      <div class="section-title"><div class="icon-wrap ic-lime"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>Performance</div>
+      <div class="section-subtitle">Goals aligned to KRAs, self-evaluation, and managed appraisal cycles.</div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Record</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Appraisal Cycle</td><td>A review period across a group of employees; generates their appraisals.</td></tr>
+          <tr><td class="field-name">Appraisal Template</td><td>The KRAs / rating criteria and weightings used in a cycle.</td></tr>
+          <tr><td class="field-name">Appraisal</td><td>One employee's review — self-score, manager score, and final rating.</td></tr>
+          <tr><td class="field-name">Goal</td><td>An objective tied to a KRA, with progress tracked over the cycle.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- RECRUITMENT -->
+    <section class="section" id="recruitment">
+      <div class="section-title"><div class="icon-wrap ic-mint"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Recruitment</div>
+      <div class="section-subtitle">From an approved headcount request to a signed offer — then straight into onboarding.</div>
+      <div class="flow">
+        <span class="node">Job Requisition</span><span class="arr">→</span>
+        <span class="node">Job Opening</span><span class="arr">→</span>
+        <span class="node alt">Applicant</span><span class="arr">→</span>
+        <span class="node">Interview</span><span class="arr">→</span>
+        <span class="node">Job Offer</span>
+      </div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Record</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Job Requisition</td><td>Request to hire for a role — approved before a posting opens.</td></tr>
+          <tr><td class="field-name">Job Opening</td><td>The published vacancy tied to a designation and department.</td></tr>
+          <tr><td class="field-name">Job Applicant</td><td>A candidate against an opening; tracks their stage.</td></tr>
+          <tr><td class="field-name">Interview / Interview Round</td><td>Scheduled evaluations with feedback and scores.</td></tr>
+          <tr><td class="field-name">Job Offer / Appointment Letter</td><td>The offer terms and generated letter; on acceptance, flows into Employee Onboarding.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- FATEH HR APP -->
+    <section class="section" id="fatehhr">
+      <div class="section-title"><div class="icon-wrap ic-sage"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>Fateh HR — Mobile App</div>
+      <div class="section-subtitle">Enfono's HR app: your HR, in your pocket. Check in from the field, apply leave, see payslips — works offline.</div>
+      <div class="callout green">
+        <h4>A product of Enfono Technologies — built on Frappe HRMS</h4>
+        Fateh HR is the mobile front end to everything above. Android app + web PWA, offline-first, English &amp; العربية. Full app manual: <a class="inline" href="https://fatehhr-docs.vercel.app/" target="_blank" rel="noopener">fatehhr-docs.vercel.app</a>.
+      </div>
+
+      <div class="prose"><h3>What employees do with it</h3></div>
+      <div class="cards">
+        <div class="card"><div class="card-icon ic-teal"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><h3>Check-in, anywhere</h3><p>GPS-stamped IN / OUT with an optional selfie — even with no network. Location is captured only at the moment you tap.</p></div>
+        <div class="card"><div class="card-icon ic-emerald"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div><h3>Built for the field</h3><p>Full offline mode. Check-ins, leave and claims queue locally and sync when connectivity returns. No data lost.</p></div>
+        <div class="card"><div class="card-icon ic-forest"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h3>Secure but friendly</h3><p>Sign in once with your work email, set a 4–6 digit PIN, then unlock with fingerprint / Face ID on supported phones.</p></div>
+        <div class="card"><div class="card-icon ic-moss"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h3>Payslips &amp; expenses</h3><p>Download any month's payslip as a PDF; file an expense claim with a receipt photo in seconds.</p></div>
+        <div class="card"><div class="card-icon ic-lime"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4M16 2v4"/></svg></div><h3>Attendance at a glance</h3><p>Monthly calendar — Present / Absent / Leave / Holiday. Tap a day for IN / OUT pairs and hours worked.</p></div>
+        <div class="card"><div class="card-icon ic-pine"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg></div><h3>English &amp; العربية</h3><p>Full Arabic with right-to-left layout. Switch language anytime from the More tab.</p></div>
+      </div>
+
+      <div class="prose"><h3>The five tabs</h3></div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Tab</th><th>What's there</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Home</td><td>Current status (IN / OUT), the check-in button, a live "Worked today" chip, last 3 check-ins, latest announcement.</td></tr>
+          <tr><td class="field-name">Attendance</td><td>Monthly calendar — tap any day to see IN / OUT pairs and total hours.</td></tr>
+          <tr><td class="field-name">Leave</td><td>Leave balances, the request form, recent applications and history.</td></tr>
+          <tr><td class="field-name">Expense</td><td>Totals (Claimed / Pending / Approved / Paid), new claim button, recent claims.</td></tr>
+          <tr><td class="field-name">More</td><td>Profile, payslips, announcements, notifications, sync errors, language, log out.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="prose"><h3>First 3 minutes</h3></div>
+      <div class="steps">
+        <div class="step"><div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div><div class="step-body"><h3>Install</h3><p><strong>Android APK</strong> (recommended — faster, offline, native notifications, biometric) from the release link HR shares; allow "install from this source" once. Or the <strong>Web app</strong> at <code>hr-demo.enfonoerp.com/fatehhr</code> → Add to Home Screen (iPhone uses this).</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div><div class="step-body"><h3>Log in &amp; set a PIN</h3><p>Sign in with your <strong>work email + password</strong> (from HR), then set a 4–6 digit PIN — that's what you use day to day instead of the full password.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div><div class="step-body"><h3>Enable biometric</h3><p>Turn on fingerprint / Face ID unlock when prompted — one-tap entry after that.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">4</div></div><div class="step-body"><h3>Check in</h3><p>Tap <strong>Check In</strong> on the Home tab to start your day. That's it.</p></div></div>
+      </div>
+
+      <div class="prose"><h3>The sync bar</h3><p>A thin status bar at the top of most screens tells you exactly where your data is:</p></div>
+      <div class="badge-grid">
+        <div class="badge grey"><span class="dot"></span>Synced now</div>
+        <div class="badge amber"><span class="dot"></span>N changes pending · tap to sync</div>
+        <div class="badge blue"><span class="dot"></span>Syncing…</div>
+        <div class="badge grey"><span class="dot"></span>Offline — working locally</div>
+        <div class="badge red"><span class="dot"></span>N sync errors · tap to retry</div>
+      </div>
+      <div class="info-box amber"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Always wait for <strong>"Synced now"</strong> before uninstalling — offline data lives in the app's private storage and is wiped on uninstall.</span></div>
+
+      <div class="prose"><h3>Privacy &amp; security</h3></div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Is my location tracked?</td><td>No background tracking — location is captured only when you tap Check In / Out.</td></tr>
+          <tr><td class="field-name">What's stored on the phone?</td><td>Session token (not your password), a hashed PIN, queued offline items, last-viewed attendance, and not-yet-uploaded photos.</td></tr>
+          <tr><td class="field-name">Phone lost or stolen?</td><td>The app is behind PIN / biometric. HR resets your API credentials on the Desk to invalidate the old session.</td></tr>
+          <tr><td class="field-name">Offline timestamps</td><td>Every action is stamped at the moment you tap — not when it later syncs.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SETTINGS / ROLES -->
+    <section class="section" id="settings">
+      <div class="section-title"><div class="icon-wrap ic-teal"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>Roles &amp; Settings</div>
+      <div class="section-subtitle">Who can do what, and where the global switches live.</div>
+      <div class="tbl-wrap">
+      <table class="field-table">
+        <thead><tr><th>Role</th><th>Typical access</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">HR Manager</td><td>Full HR — masters, policies, payroll, approvals, settings.</td></tr>
+          <tr><td class="field-name">HR User</td><td>Day-to-day HR operations; usually not payroll finalisation.</td></tr>
+          <tr><td class="field-name">Employee</td><td>Self-service — own profile, leave, claims, payslips (the Fateh HR surface).</td></tr>
+          <tr><td class="field-name">Leave / Expense Approver</td><td>Set per employee (or via department) to approve their requests.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="prose">
+        <h3>Where settings live</h3>
+        <ul>
+          <li><strong>HR Settings</strong> — global switches (leave/attendance/payroll behaviour, employee naming).</li>
+          <li><strong>Holiday List</strong> — per company / group; assigned on the Employee.</li>
+          <li><strong>Approvers</strong> — Leave Approver &amp; Expense Approver on the Employee (or department defaults).</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ROLLOUT -->
+    <section class="section" id="rollout">
+      <div class="section-title"><div class="icon-wrap ic-sage"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>Rollout Checklist</div>
+      <div class="section-subtitle">The Enfono order for standing up HR for a new client.</div>
+      <div class="prose">
+        <ol>
+          <li>Company, departments, designations, grades, employment types created.</li>
+          <li>Holiday List(s) built and assigned to employees.</li>
+          <li>Employees created (or imported) with joining date, reporting line, User ID.</li>
+          <li>Leave Types + Leave Policy defined; Policy Assignments run so balances exist.</li>
+          <li>Shift Type(s) with Auto Attendance; Shift Assignments for shift staff.</li>
+          <li>Expense Claim Types mapped to accounts; approvers set.</li>
+          <li>Salary Components + Salary Structures built; Structure Assignments done; statutory (e.g. GOSI) confirmed.</li>
+          <li>Roles assigned (HR Manager / HR User / Employee); approvers per employee.</li>
+          <li>Test one full cycle: check-in → attendance → leave → expense → payroll → payslip.</li>
+          <li>Roll out <strong>Fateh HR</strong> to staff — share the APK / web URL, brief them on login → PIN → check-in.</li>
+        </ol>
+      </div>
+      <div class="callout green">
+        <h4>Employee rollout</h4>
+        The fastest adoption win: get every employee on <a class="inline" href="https://fatehhr-docs.vercel.app/guide/getting-started" target="_blank" rel="noopener">Fateh HR</a> for check-in and self-service on day one. Attendance, leave and payslips then flow with zero paperwork.
+      </div>
+    </section>
+
+    <hr class="divider" />
+    <div style="text-align:center;color:#7d9a8b;font-size:12px;padding-bottom:48px;">
+      <p>HR &amp; Payroll Implementation Guide · <strong style="color:#5c7a6c;">Enfono Technologies</strong></p>
+      <p style="margin-top:4px;">ERPNext v15 · Frappe HRMS · Fateh HR mobile app · Rev. July 2026</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
