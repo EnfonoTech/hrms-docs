@@ -51,6 +51,11 @@
     .shot img{width:100%;display:block}
     .shot figcaption{font-size:12.5px;color:#5c7a6c;padding:10px 16px;background:#f7fbf9;border-top:1px solid var(--border)}
     .shot figcaption b{color:var(--brand-deep)}
+    .phones{display:flex;flex-wrap:wrap;gap:16px;margin:18px 0 8px}
+    .phone{width:222px;max-width:47%;border-radius:24px;overflow:hidden;border:5px solid #14342a;box-shadow:0 12px 28px rgba(20,52,42,.18);background:#14342a}
+    .phone img{width:100%;display:block;border-radius:19px 19px 0 0}
+    .phone figcaption{font-size:11.5px;color:#cfe9dc;background:#14342a;padding:8px 10px;text-align:center;font-weight:700;letter-spacing:.3px}
+    @media (max-width:640px){.phone{max-width:100%;width:100%}}
 
     .steps{position:relative;margin:12px 0}
     .step{display:flex;gap:18px;position:relative}
@@ -350,22 +355,114 @@
       <div class="section-subtitle">Enfono's HR app: check in from the field, apply leave, see payslips — works offline.</div>
       <div class="callout green"><h4>A product of Enfono Technologies — part of the Fateh HRMS suite</h4>Fateh HR is the mobile front end to everything above (Android app + web PWA, offline-first, English &amp; العربية). Full app manual &amp; screenshots: <a class="inline" href="https://fatehhr-docs.vercel.app/" target="_blank" rel="noopener">fatehhr-docs.vercel.app</a> · web demo: <code>hr-demo.enfonoerp.com/fatehhr</code>.</div>
 
-      <h3 class="hdr">What employees do with it</h3>
-      <div class="cards">
-        <div class="card"><div class="card-icon ic-teal"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><h3>Check-in, anywhere</h3><p>GPS-stamped IN/OUT with an optional selfie — even offline. Location is captured only when you tap.</p></div>
-        <div class="card"><div class="card-icon ic-emerald"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div><h3>Works offline</h3><p>Check-ins, leave and claims queue locally and sync when the network returns. Nothing lost.</p></div>
-        <div class="card"><div class="card-icon ic-forest"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h3>Secure, simple</h3><p>Sign in once, set a 4–6 digit PIN, unlock with fingerprint / Face ID.</p></div>
-        <div class="card"><div class="card-icon ic-moss"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><h3>Payslips &amp; expenses</h3><p>Download any month's payslip; file an expense claim with a receipt photo in seconds.</p></div>
+      <h3 class="hdr">The five tabs — at a glance</h3>
+      <p class="prose">Everything lives under five tabs on the bottom bar. Tap between them anytime.</p>
+      <div class="phones">
+        <figure class="phone"><img src="img/fateh-home.jpeg" alt="Home tab" loading="lazy" /><figcaption>Home</figcaption></figure>
+        <figure class="phone"><img src="img/fateh-attendance.jpeg" alt="Attendance tab" loading="lazy" /><figcaption>Attendance</figcaption></figure>
+        <figure class="phone"><img src="img/fateh-leave.jpeg" alt="Leave tab" loading="lazy" /><figcaption>Leave</figcaption></figure>
+        <figure class="phone"><img src="img/fateh-expense.jpeg" alt="Expense tab" loading="lazy" /><figcaption>Expense</figcaption></figure>
+        <figure class="phone"><img src="img/fateh-profile.jpeg" alt="More tab" loading="lazy" /><figcaption>More</figcaption></figure>
+      </div>
+      <div class="tbl-wrap"><table class="field-table">
+        <thead><tr><th>Tab</th><th>What's there</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Home</td><td>Your status (checked in / out), the big Check In / Out button, a live "worked today" line, quick actions (Leave, Expense, Tasks, Payslips), and recent check-in history.</td></tr>
+          <tr><td class="field-name">Attendance</td><td>Monthly calendar — tap any day for its IN / OUT pairs and hours.</td></tr>
+          <tr><td class="field-name">Leave</td><td>Leave balances, the request form, and your application history.</td></tr>
+          <tr><td class="field-name">Expense</td><td>Totals (Claimed / Pending / Approved / Paid), new-claim button, recent claims.</td></tr>
+          <tr><td class="field-name">More</td><td>Profile, payslips, announcements, notifications, sync status, language, log out.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3 class="hdr">Install the app</h3>
+      <div class="steps">
+        <div class="step"><div class="step-left"><div class="step-num">A</div><div class="step-line"></div></div><div class="step-body"><p><b>Android (recommended)</b> — open the APK link HR shares, tap it, and allow "install from this source" once. Faster, works offline, native notifications &amp; biometric.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">B</div><div class="step-line"></div></div><div class="step-body"><p><b>Any phone (web)</b> — open <code>hr-demo.enfonoerp.com/fatehhr</code> in the browser, then <b>Add to Home Screen</b> so it opens like an app.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">C</div></div><div class="step-body"><p><b>iPhone</b> — use the web option above via Safari's Share → Add to Home Screen (a native iOS build is on the roadmap).</p></div></div>
+      </div>
+      <div class="info-box blue"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span>To update the Android app, just tap the new APK link HR shares → Install. Your login and PIN stay.</span></div>
+
+      <h3 class="hdr">Log in, set a PIN &amp; biometric</h3>
+      <div class="steps">
+        <div class="step"><div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div><div class="step-body"><p>Sign in with your <b>work email + password</b> (from HR). Each person needs their own login.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div><div class="step-body"><p>Set a <b>4–6 digit PIN</b> — that's what you use day to day instead of the full password.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">3</div></div><div class="step-body"><p>Turn on <b>fingerprint / Face ID</b> unlock when prompted for one-tap entry. After ~2 hours idle the app asks for your PIN / fingerprint again — that's the session timeout, expected.</p></div></div>
       </div>
 
-      <h3 class="hdr">Get the app (first 3 minutes)</h3>
-      <div class="steps">
-        <div class="step"><div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div><div class="step-body"><p><b>Install</b> — Android APK (from the link HR shares; allow "install from this source" once) or the web app at <code>hr-demo.enfonoerp.com/fatehhr</code> → Add to Home Screen (iPhone).</p></div></div>
-        <div class="step"><div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div><div class="step-body"><p><b>Log in</b> with your work email + password, then set a PIN.</p></div></div>
-        <div class="step"><div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div><div class="step-body"><p><b>Enable biometric</b> unlock when prompted.</p></div></div>
-        <div class="step"><div class="step-left"><div class="step-num">4</div></div><div class="step-body"><p><b>Check in</b> on the Home tab. Done.</p></div></div>
+      <h3 class="hdr">Check in &amp; check out</h3>
+      <p class="prose">The core of the app. On the <b>Home</b> tab tap <b>Check In</b> to start your day and <b>Check Out</b> to end it. The button captures your GPS location (and an optional selfie) at the moment you tap — there's no background tracking. Your "worked today" time ticks live, and recent check-ins show below.</p>
+      <div class="phones">
+        <figure class="phone"><img src="img/fateh-checkin-map.jpeg" alt="Check-in map" loading="lazy" /><figcaption>Location at check-in</figcaption></figure>
+        <figure class="phone"><img src="img/fateh-checkin-history.jpeg" alt="Check-in history" loading="lazy" /><figcaption>Check-in history</figcaption></figure>
       </div>
-      <div class="info-box amber"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>The top sync bar shows where your data is: <b>Synced now</b> · <b>N pending</b> · <b>Syncing</b> · <b>Offline</b> · <b>N errors</b>. Wait for "Synced now" before uninstalling.</span></div>
+      <div class="info-box amber"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span><b>Forgot to check out?</b> The app auto-closes the open pair at midnight (marked "auto-closed"). If your task has a <b>geofence</b>, checking in outside the radius is allowed but flagged for your manager.</span></div>
+
+      <h3 class="hdr">Working offline &amp; the sync bar</h3>
+      <p class="prose">Fateh HR is built for the field — it works with no signal. Check-ins, leave and claims are saved on the phone and upload automatically when you're back online, <b>timestamped at the moment you tapped</b> (not when they sync). The thin bar at the top always tells you where your data is:</p>
+      <div class="badge-grid">
+        <div class="badge grey"><span class="dot"></span>Synced now</div>
+        <div class="badge amber"><span class="dot"></span>N changes pending · tap to sync</div>
+        <div class="badge blue"><span class="dot"></span>Syncing…</div>
+        <div class="badge grey"><span class="dot"></span>Offline — working locally</div>
+        <div class="badge red"><span class="dot"></span>N sync errors · tap to retry</div>
+      </div>
+      <div class="info-box green"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg><span>You can work offline for days. Just wait for <b>"Synced now"</b> before uninstalling — queued items live inside the app and are wiped on uninstall.</span></div>
+
+      <h3 class="hdr">Attendance calendar</h3>
+      <p class="prose">The <b>Attendance</b> tab shows the month colour-coded — Present, Absent, On Leave, Holiday. Tap any day to expand its <b>IN / OUT pairs and total hours</b>.</p>
+      <div class="phones"><figure class="phone"><img src="img/fateh-attendance.jpeg" alt="Attendance calendar" loading="lazy" /><figcaption>Monthly attendance</figcaption></figure></div>
+
+      <h3 class="hdr">Apply for leave</h3>
+      <div class="steps">
+        <div class="step"><div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div><div class="step-body"><p>Open the <b>Leave</b> tab — your balances per leave type are at the top.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div><div class="step-body"><p>Tap <b>Apply</b>, choose the <b>leave type</b> and <b>from / to</b> dates (you can backdate leave already taken), add a reason.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">3</div></div><div class="step-body"><p>Submit — it goes to your approver, and the status shows in your history.</p></div></div>
+      </div>
+      <div class="phones"><figure class="phone"><img src="img/fateh-leave.jpeg" alt="Leave balances" loading="lazy" /><figcaption>Leave balances &amp; requests</figcaption></figure></div>
+      <div class="info-box amber"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Balance shows 0 but you should have some? HR needs to create a Leave Allocation for you on the desk.</span></div>
+
+      <h3 class="hdr">File an expense claim</h3>
+      <div class="steps">
+        <div class="step"><div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div><div class="step-body"><p>Open the <b>Expense</b> tab and tap <b>New Claim</b>.</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div><div class="step-body"><p>Add each line — type, amount, and a <b>receipt photo</b> (required per line).</p></div></div>
+        <div class="step"><div class="step-left"><div class="step-num">3</div></div><div class="step-body"><p>Submit. Track it in the totals (Claimed / Pending / Approved / Paid). An approver may sanction a reduced amount — the "Approved" figure shows what was granted.</p></div></div>
+      </div>
+      <div class="phones"><figure class="phone"><img src="img/fateh-expense.jpeg" alt="Expense claims" loading="lazy" /><figcaption>Expense claims</figcaption></figure></div>
+
+      <h3 class="hdr">Payslips</h3>
+      <p class="prose">The <b>Payslips</b> quick action (Home) or <b>More › Payslips</b> lists every payslip on your record. Tap one to view the earnings/deductions breakdown and <b>download the PDF</b>. New months appear automatically once HR runs payroll.</p>
+      <div class="phones"><figure class="phone"><img src="img/fateh-payslips.jpeg" alt="Payslips list" loading="lazy" /><figcaption>Payslips</figcaption></figure></div>
+
+      <h3 class="hdr">Tasks</h3>
+      <p class="prose">The <b>Tasks</b> quick action lists work assigned to you. Open a task to see its details and, where enabled, run a <b>timer</b> while you work on it — handy for time-tracked or geofenced field jobs.</p>
+      <div class="phones">
+        <figure class="phone"><img src="img/fateh-tasks.jpeg" alt="Tasks list" loading="lazy" /><figcaption>Task list</figcaption></figure>
+        <figure class="phone"><img src="img/fateh-tasks-timer.jpeg" alt="Task timer running" loading="lazy" /><figcaption>Task timer</figcaption></figure>
+      </div>
+
+      <h3 class="hdr">Announcements, profile &amp; language</h3>
+      <p class="prose">The <b>More</b> tab holds company <b>announcements</b>, notifications, your <b>profile</b> (roles, assigned info, app version, this guide) and <b>log out</b>. Switch the whole app between <b>English and العربية</b> (full right-to-left) from here.</p>
+      <div class="phones">
+        <figure class="phone"><img src="img/fateh-announcements.jpeg" alt="Announcements" loading="lazy" /><figcaption>Announcements</figcaption></figure>
+        <figure class="phone"><img src="img/fateh-profile.jpeg" alt="Profile / More" loading="lazy" /><figcaption>Profile</figcaption></figure>
+        <figure class="phone"><img src="img/fateh-arabic.jpeg" alt="Arabic RTL" loading="lazy" /><figcaption>العربية (RTL)</figcaption></figure>
+      </div>
+
+      <h3 class="hdr">Troubleshooting &amp; FAQ</h3>
+      <div class="tbl-wrap"><table class="field-table">
+        <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+        <tbody>
+          <tr><td class="field-name">Is my location tracked all day?</td><td>No — location is captured only at the moment you tap Check In / Out. No background tracking.</td></tr>
+          <tr><td class="field-name">I forgot to check out.</td><td>The app auto-closes the open pair at midnight; the day still counts as Present (hours stop at 23:59).</td></tr>
+          <tr><td class="field-name">How long can I stay offline?</td><td>Indefinitely — everything queues locally and syncs in order when you reconnect.</td></tr>
+          <tr><td class="field-name">Can I backdate a leave request?</td><td>Yes — pick the past dates; HR sees the submission date differs (normal).</td></tr>
+          <tr><td class="field-name">Claim without a receipt?</td><td>No — every expense line needs a receipt photo. Tell HR if a receipt is lost.</td></tr>
+          <tr><td class="field-name">Lost or stolen phone?</td><td>The app is behind your PIN / biometric. Ask HR to reset your API credentials to kill the old session.</td></tr>
+          <tr><td class="field-name">Can I use a tablet?</td><td>Yes — the web app works on tablets (phone layout).</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout green"><h4>Full app manual</h4>Every screen has a deeper walkthrough at <a class="inline" href="https://fatehhr-docs.vercel.app/" target="_blank" rel="noopener">fatehhr-docs.vercel.app</a> — share it with staff during rollout.</div>
     </section>
 
     <hr class="divider" />
